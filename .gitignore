@@ -1,0 +1,8 @@
+venv/
+*.pdf
+*.pyc
+*.log
+*.txt
+*.json
+*.yaml
+*.yml

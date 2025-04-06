@@ -35,8 +35,8 @@ class TranslationService:
     def _preserve_placeholders(self, text: str) -> Tuple[str, List[str]]:
         """
         Preserve placeholders in the text by replacing them with temporary markers.
-        Any text within square brackets [] is considered a placeholder.
-        Uses Unicode characters unlikely to be modified by translation.
+        Only text within square brackets [] that matches known placeholders or contains valid placeholder content
+        will be preserved.
         """
         placeholders = []
         processed_text = text
@@ -45,57 +45,37 @@ class TranslationService:
         pattern = r'\[([^\]]+)\]'
         matches = list(re.finditer(pattern, text))
         
-        # Replace each placeholder with a marker using special Unicode characters
+        # Replace each valid placeholder with a marker
         for i, match in enumerate(matches):
             full_placeholder = match.group(0)  # The complete [placeholder]
-            placeholders.append(full_placeholder)
-            # Use Unicode markers that are less likely to be modified
-            marker = f"❮❮PH{i}❯❯"
-            processed_text = processed_text.replace(full_placeholder, marker)
+            inner_text = match.group(1)  # The text inside brackets
+            
+            # Only preserve if it's a known placeholder or contains valid placeholder content
+            if (inner_text in self.known_placeholders or 
+                any(word in inner_text for word in ['Name', 'name', 'number', 'count', 'year', 'param', 'data'])):
+                placeholders.append(full_placeholder)
+                processed_text = processed_text.replace(full_placeholder, f"__PH{i}__")
         
         return processed_text, placeholders
 
     def _restore_placeholders(self, text: str, placeholders: List[str], is_google: bool = False, target_language: str = None) -> str:
         """
-        Restore placeholders in the translated text with additional verification.
-        Handles various possible formats that might appear in translations.
+        Restore placeholders in the translated text.
+        Only restore markers that correspond to actual placeholders.
         """
         result = text
         
-        # Special handling for Japanese Google Translate
-        if is_google and target_language == 'Japanese':
-            # Fix common Japanese Google Translate placeholder mangling
-            result = re.sub(r'ph(\d+)❯❯', r'❮❮PH\1❯❯', result)
-            result = re.sub(r'PH(\d+)❯❯', r'❮❮PH\1❯❯', result)
-        
-        # Define possible placeholder patterns that might appear
-        placeholder_patterns = [
-            r'❮❮PH(\d+)❯❯',           # Our special Unicode markers
-            r'__PLACEHOLDER_(\d+)__',   # Standard format
-            r'PLACEHOLDER_(\d+)',       # Modified format
-            r'PlaceHolder_(\d+)',       # Another possible format
-            r'Placeholder_(\d+)',       # Case variation
-            r'placeholder_(\d+)',       # Lowercase variation
-            r'PH(\d+)',                 # Shortened format
-            r'ph(\d+)',                 # Lowercase shortened format
-        ]
-        
-        # First, try to restore our special Unicode markers
+        # First pass: restore exact matches
         for i, placeholder in enumerate(placeholders):
-            marker = f"❮❮PH{i}❯❯"
+            marker = f"__PH{i}__"
             if marker in result:
                 result = result.replace(marker, placeholder)
         
-        # Then check for any remaining placeholder patterns and restore them
-        for pattern in placeholder_patterns:
-            matches = re.finditer(pattern, result, re.IGNORECASE)
-            for match in matches:
-                try:
-                    index = int(match.group(1))
-                    if 0 <= index < len(placeholders):
-                        result = result.replace(match.group(0), placeholders[index])
-                except (ValueError, IndexError):
-                    continue
+        # Second pass: clean up any remaining markers that shouldn't be there
+        result = re.sub(r'__PH\d+__', '', result)  # Remove any unmatched markers
+        result = re.sub(r'❮❮PH\d+❯❯', '', result)  # Remove any legacy markers
+        result = re.sub(r'\s+', ' ', result)  # Clean up extra spaces
+        result = result.strip()
         
         return result
 

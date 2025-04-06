@@ -7,3 +7,4 @@ googletrans-py
 scikit-learn
 streamlit
 plotly
+nltk

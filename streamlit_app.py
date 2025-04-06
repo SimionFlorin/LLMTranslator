@@ -7,17 +7,33 @@ import io
 import csv
 from typing import Dict
 import nltk
+import os
 
-# Initialize services
-translator = TranslationService()
-evaluator = TranslationEvaluator()
-
-# Set page config
 st.set_page_config(
     page_title="Broker Translation",
     page_icon="🌐",
     layout="wide"
 )
+
+# Initialize services
+translator = TranslationService()
+evaluator = TranslationEvaluator()
+
+# Ensure NLTK data is available
+@st.cache_resource
+def setup_nltk():
+    try:
+        # Try to download required NLTK data
+        nltk.download('wordnet', quiet=True)
+        nltk.download('punkt', quiet=True)
+        nltk.download('punkt_tab', quiet=True)
+    except Exception as e:
+        st.error(f"Error downloading NLTK data: {str(e)}")
+        st.info("Please ensure NLTK data is properly installed in the Docker container.")
+        raise
+
+# Call the setup function
+setup_nltk()
 
 # Add custom CSS
 st.markdown("""

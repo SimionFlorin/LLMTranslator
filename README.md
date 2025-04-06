@@ -2,48 +2,19 @@
 
 A multilingual translation application using LLM (Large Language Model) to translate web content into multiple languages.
 
-## Setup
+## Prerequisites
 
+- Python 3.10 (required for compatibility)
+- Docker (recommended for easy setup)
+
+## Setup
 
 Create a `.env` file in the root directory and add your OpenAI API key:
 ```
 OPENAI_API_KEY=your_api_key_here
 ```
 
-
-### Option 1: Local Setup
-
-1. Create and activate a virtual environment:
-
-   **For Linux/Mac:**
-   ```bash
-   # Create virtual environment
-   python -m venv venv
-   
-   # Activate virtual environment
-   source venv/bin/activate
-   ```
-
-   **For Windows:**
-   ```bash
-   # Create virtual environment
-   python -m venv venv
-   
-   # Activate virtual environment
-   venv\Scripts\activate
-   ```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the Streamlit application:
-```bash
-streamlit run streamlit_app.py
-```
-
-### Option 2: Docker Setup
+### Option 1: Docker Setup (Recommended)
 
 1. Build the Docker image:
 ```bash
@@ -56,6 +27,38 @@ docker run -p 8501:8501 brokertranslator
 ```
 
 The application will be available at `http://localhost:8501`
+
+### Option 2: Local Setup
+
+1. Create and activate a virtual environment:
+
+   **For Linux/Mac:**
+   ```bash
+   # Create virtual environment
+   python3.10 -m venv venv
+   
+   # Activate virtual environment
+   source venv/bin/activate
+   ```
+
+   **For Windows:**
+   ```bash
+   # Create virtual environment
+   python3.10 -m venv venv
+   
+   # Activate virtual environment
+   venv\Scripts\activate
+   ```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the Streamlit application:
+```bash
+streamlit run streamlit_app.py
+```
 
 ## Features
 

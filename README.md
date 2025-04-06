@@ -60,6 +60,18 @@ pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
+### Last Resort: Development Requirements
+
+If both Docker and local setup fail, you can try using the development requirements which have more lenient version constraints:
+
+1. Follow the local setup steps 1 and 3 above
+2. Instead of installing requirements.txt, use:
+```bash
+pip install -r requirements_dev.txt
+```
+
+**Note:** The development requirements should only be used as a last resort if both Docker and standard local setup fail. They contain more lenient version constraints which might lead to compatibility issues.
+
 ## Features
 
 - Modern, responsive Streamlit interface with three main sections:
@@ -93,6 +105,7 @@ streamlit run streamlit_app.py
   - Streamlit for the web interface
   - NLTK for evaluation metrics
   - Other essential libraries
+- `requirements_dev.txt`: Last resort dependencies with more lenient version constraints (use only if other methods fail)
 - `translated_output.csv`: Sample dataset for evaluation
 - `Dockerfile`: Container configuration for easy deployment
 

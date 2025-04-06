@@ -1,0 +1,10 @@
+openai
+pandas
+numpy
+python-dotenv
+altair
+googletrans-py
+scikit-learn
+streamlit
+plotly
+nltk

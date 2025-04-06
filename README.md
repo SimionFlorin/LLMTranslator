@@ -45,24 +45,58 @@ The application will be available at `http://localhost:8501`
 
 ## Features
 
-- Modern, responsive Streamlit interface
-- Translate text to multiple languages (Spanish, French, German, Japanese, Arabic, Hindi, Portuguese, Hungarian)
-- Preserve placeholders in translations
-- Interactive translation quality evaluation
-- Visual comparison with Google Translate baseline
-- Real-time translation and evaluation metrics
+- Modern, responsive Streamlit interface with three main sections:
+  - Single text translation
+  - Batch processing for multiple translations
+  - Translation quality evaluation
+- Powered by GPT-4 for high-quality translations
+- Support for multiple languages (Spanish, French, German, Japanese, Arabic, Hindi, Portuguese, Hungarian)
+- Smart placeholder preservation in translations
+- Comprehensive translation quality evaluation using METEOR and BLEU scores
+- Real-time progress tracking during batch processing
+- Comparison with Google Translate as a baseline
+- Detailed statistical analysis with standard deviations
 
 ## Project Structure
 
-- `streamlit_app.py`: Main Streamlit application
-- `translator.py`: Translation logic using LLM
-- `evaluator.py`: Translation quality evaluation
-- `requirements.txt`: Project dependencies
-- `translated_output.csv`: Evaluation dataset
-- `Dockerfile`: Container configuration
+- `streamlit_app.py`: Main application interface with three pages:
+  - Translation interface for single texts
+  - Batch processing for multiple translations
+  - Evaluation page with quality metrics
+- `translator.py`: Core translation logic using GPT-4 and Google Translate
+  - Handles placeholder preservation
+  - Manages API interactions
+  - Provides language support
+- `evaluator.py`: Quality evaluation system
+  - Implements METEOR and BLEU scoring
+  - Handles batch processing
+  - Provides statistical analysis
+- `requirements.txt`: Project dependencies including:
+  - OpenAI API client
+  - Streamlit for the web interface
+  - NLTK for evaluation metrics
+  - Other essential libraries
+- `translated_output.csv`: Sample dataset for evaluation
+- `Dockerfile`: Container configuration for easy deployment
 
 ## Evaluation Metrics
 
-The application provides two main metrics for translation quality:
-1. Reference Overlap: Measures similarity with reference translations
-2. Word Preservation: Tracks maintenance of key terms and placeholders 
+The application uses two industry-standard metrics for translation quality evaluation:
+
+1. **METEOR Score (Metric for Evaluation of Translation with Explicit ORdering)**
+   - Evaluates translations by considering exact matches, stems, synonyms, and paraphrases
+   - Score range: 0 to 1 (higher is better)
+   - Particularly good at recognizing valid paraphrases and handling word order variations
+   - Better correlation with human judgments compared to other metrics
+
+2. **BLEU Score (BiLingual Evaluation Understudy)**
+   - Measures n-gram overlap between the candidate translation and reference translation
+   - Score range: 0 to 1 (higher is better)
+   - Industry standard metric for machine translation evaluation
+   - Good at capturing translation fluency and phrase accuracy
+
+The evaluation process:
+- Compares translations against human reference translations
+- Calculates both METEOR and BLEU scores for each translation
+- Provides running averages and standard deviations during batch processing
+- Allows comparison between LLM and Google Translate results 

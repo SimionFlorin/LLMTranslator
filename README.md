@@ -1,8 +1,15 @@
-# BrokerChooser Translation Application
+# Broker Translation Application
 
 A multilingual translation application using LLM (Large Language Model) to translate web content into multiple languages.
 
 ## Setup
+
+
+Create a `.env` file in the root directory and add your OpenAI API key:
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
 
 ### Option 1: Local Setup
 
@@ -17,11 +24,6 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file in the root directory and add your OpenAI API key:
-```
-OPENAI_API_KEY=your_api_key_here
-```
-
 4. Run the Streamlit application:
 ```bash
 streamlit run streamlit_app.py
@@ -31,12 +33,12 @@ streamlit run streamlit_app.py
 
 1. Build the Docker image:
 ```bash
-docker build -t brokerchoosertranslator .
+docker build -t brokertranslator .
 ```
 
 2. Run the container:
 ```bash
-docker run -p 8501:8501 -e OPENAI_API_KEY=your_api_key_here brokerchoosertranslator
+docker run -p 8501:8501 brokertranslator
 ```
 
 The application will be available at `http://localhost:8501`

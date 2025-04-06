@@ -1,5 +1,5 @@
 # Use Python 3.10 slim image as base
-FROM python:3.12-slim
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
@@ -10,23 +10,17 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy application files
-# COPY requirements.txt .
-# COPY *.py .
-# COPY translated_output.csv .
+COPY requirements.txt .
+COPY *.py .
+COPY translated_output.csv .
+COPY .env .
 
-# COPY eveything except the venv
-COPY . .
 
 
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables
-# ENV STREAMLIT_SERVER_PORT=8501
-# ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
-# ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
-# ENV STREAMLIT_SERVER_HEADLESS=true
 
 # Expose the port Streamlit runs on
 EXPOSE 8501

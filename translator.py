@@ -116,12 +116,12 @@ class TranslationService:
         
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4",  # Changed to GPT-4
+                model="gpt-4o",  # Changed to GPT-4
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.3
+                temperature=0.1
             )
             
             translated_text = response.choices[0].message.content.strip()
@@ -157,15 +157,6 @@ Return ONLY the translation."""
             print(f"Error in LLM translation: {str(e)}")
             return None
 
-    async def _async_google_translate(self, text: str, lang_code: str) -> str:
-        """Async function to perform Google translation."""
-        try:
-            translation = await self.google_translator.translate(text, dest=lang_code)
-            return translation.text
-        except Exception as e:
-            print(f"Error in async Google translation: {str(e)}")
-            return None
-
     def translate_with_google(self, text: str, target_language: str) -> str:
         """Translate text using Google Translate as a baseline."""
         try:
@@ -176,12 +167,9 @@ Return ONLY the translation."""
             if not lang_code:
                 raise ValueError(f"Unsupported language: {target_language}")
             
-            # Run the async translation in a thread pool
-            loop = asyncio.new_event_loop()
-            with ThreadPoolExecutor() as executor:
-                future = executor.submit(lambda: loop.run_until_complete(
-                    self._async_google_translate(text_with_markers, lang_code)))
-                result = future.result()
+            # Perform synchronous translation
+            translation = self.google_translator.translate(text_with_markers, dest=lang_code)
+            result = translation.text if translation else None
             
             # Restore placeholders after translation
             if result:

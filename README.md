@@ -13,11 +13,25 @@ OPENAI_API_KEY=your_api_key_here
 
 ### Option 1: Local Setup
 
-1. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+1. Create and activate a virtual environment:
+
+   **For Linux/Mac:**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment
+   source venv/bin/activate
+   ```
+
+   **For Windows:**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment
+   venv\Scripts\activate
+   ```
 
 2. Install dependencies:
 ```bash

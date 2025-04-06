@@ -16,8 +16,6 @@ COPY translated_output.csv .
 COPY .env .
 
 
-
-
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 

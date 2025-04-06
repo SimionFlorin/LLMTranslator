@@ -14,7 +14,7 @@ evaluator = TranslationEvaluator()
 
 # Set page config
 st.set_page_config(
-    page_title="BrokerChooser Translation",
+    page_title="Broker Translation",
     page_icon="🌐",
     layout="wide"
 )
@@ -38,7 +38,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title and description
-st.title("🌐 BrokerChooser Translation Service")
+st.title("🌐 Broker Translation Service")
 st.markdown("""
     Translate your content into multiple languages using advanced AI technology.
     Compare results between our LLM-based translation and Google Translate.
@@ -189,7 +189,6 @@ else:  # Evaluation page
             progress_bar = st.progress(0)
             status_text = st.empty()
             metrics_container = st.empty()
-            chart_container = st.empty()
             
             def update_progress(current: int, total: int, current_metrics: Dict):
                 # Update progress bar
@@ -255,56 +254,6 @@ else:  # Evaluation page
                     f"{metrics['google_bleu']:.3f}",
                     f"±{metrics['google_bleu_std']:.3f}"
                 )
-            
-            # Prepare data for visualization
-            chart_data = pd.DataFrame({
-                'Metric': ['METEOR', 'METEOR', 'BLEU', 'BLEU'],
-                'Score': [
-                    metrics['llm_meteor'],
-                    metrics['google_meteor'],
-                    metrics['llm_bleu'],
-                    metrics['google_bleu']
-                ],
-                'Std': [
-                    metrics['llm_meteor_std'],
-                    metrics['google_meteor_std'],
-                    metrics['llm_bleu_std'],
-                    metrics['google_bleu_std']
-                ],
-                'Model': ['LLM', 'Google Translate', 'LLM', 'Google Translate']
-            })
-            
-            # Create visualization
-            base = alt.Chart(chart_data).encode(
-                x='Metric:N',
-                y='Score:Q',
-                color='Model:N'
-            ).properties(
-                width=300,
-                height=200
-            )
-
-            # Create bars
-            bars = base.mark_bar()
-
-            # Create error bars
-            error_bars = base.mark_errorbar().encode(
-                y='Score:Q',
-                y2=alt.Y2('Score:Q', title=None),
-                yError='Std:Q'
-            )
-
-            # Combine bars and error bars, then facet by Model
-            final_chart = (bars + error_bars).facet(
-                column='Model:N'
-            ).properties(
-                title='Translation Quality Metrics'
-            ).resolve_scale(
-                y='independent'
-            )
-            
-            # Display the combined chart
-            st.altair_chart(final_chart, use_container_width=True)
                 
         except Exception as e:
             st.error(f"Error evaluating dataset: {str(e)}")

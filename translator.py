@@ -81,22 +81,19 @@ class TranslationService:
 
     def translate_with_llm(self, text: str, target_language: str) -> str:
         """Translate text using OpenAI's LLM."""
-        # Preserve placeholders
-        text_with_markers, placeholders = self._preserve_placeholders(text)
-        
-        # Prepare the prompt with explicit instructions about placeholders
+        # Prepare the prompt with explicit instructions about preserving square brackets
         system_prompt = """You are a professional translator. Follow these rules strictly:
 1. Translate ONLY the provided text, without adding any explanations or notes
-2. Preserve all ❮❮PHX❯❯ markers exactly as they appear
+2. Preserve ALL text within square brackets [] exactly as it appears, do not translate it
 3. Return ONLY the translated text, nothing else
 4. Do not explain what you're doing
 5. Do not include any metadata or instructions in the output"""
 
-        user_prompt = f"""Translate this text to {target_language}, keeping all ❮❮PHX❯❯ markers unchanged: {text_with_markers}"""
+        user_prompt = f"""Translate this text to {target_language}, keeping all text within square brackets [] unchanged: {text}"""
         
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",  # Changed to GPT-4
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -105,26 +102,21 @@ class TranslationService:
             )
             
             translated_text = response.choices[0].message.content.strip()
-            # Restore placeholders
-            result = self._restore_placeholders(translated_text, placeholders)
             
-            # Clean up any remaining PHX markers (should not exist, but just in case)
-            result = re.sub(r'❮❮PHX❯❯', '', result)
+            # Verify all square brackets are preserved
+            original_brackets = re.findall(r'\[.*?\]', text)
+            translated_brackets = re.findall(r'\[.*?\]', translated_text)
             
-            # Verify all placeholders were restored
-            missing_placeholders = []
-            for placeholder in placeholders:
-                if placeholder not in result:
-                    missing_placeholders.append(placeholder)
-            
-            if missing_placeholders:
-                # If any placeholders are missing, try one more time with a more strict prompt
-                retry_prompt = f"""Translate this text to {target_language}. The markers ❮❮PHX❯❯ MUST appear exactly as shown in the output: {text_with_markers}
+            if len(original_brackets) != len(translated_brackets):
+                # If brackets are missing, try one more time with a more strict prompt
+                retry_prompt = f"""Translate this text to {target_language}. 
+IMPORTANT: Keep ALL text within square brackets [] EXACTLY as it appears, do not translate or modify it.
+Text to translate: {text}
 
 Return ONLY the translation."""
                 
                 response = self.openai_client.chat.completions.create(
-                    model="gpt-4o",  # Changed to GPT-4
+                    model="gpt-4o",
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": retry_prompt}
@@ -133,11 +125,8 @@ Return ONLY the translation."""
                 )
                 
                 translated_text = response.choices[0].message.content.strip()
-                result = self._restore_placeholders(translated_text, placeholders)
-                # Clean up any remaining PHX markers again
-                result = re.sub(r'❮❮PHX❯❯', '', result)
             
-            return result
+            return translated_text
         except Exception as e:
             print(f"Error in LLM translation: {str(e)}")
             return None

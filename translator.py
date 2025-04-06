@@ -73,7 +73,7 @@ class TranslationService:
         
         # Second pass: clean up any remaining markers that shouldn't be there
         result = re.sub(r'__PH\d+__', '', result)  # Remove any unmatched markers
-        result = re.sub(r'❮❮PH\d+❯❯', '', result)  # Remove any legacy markers
+        result = re.sub(r'❮❮PHX❯❯', '', result)  # Remove any legacy markers
         result = re.sub(r'\s+', ' ', result)  # Clean up extra spaces
         result = result.strip()
         
@@ -101,12 +101,15 @@ class TranslationService:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                temperature=0.1
+                temperature=0.2
             )
             
             translated_text = response.choices[0].message.content.strip()
             # Restore placeholders
             result = self._restore_placeholders(translated_text, placeholders)
+            
+            # Clean up any remaining PHX markers (should not exist, but just in case)
+            result = re.sub(r'❮❮PHX❯❯', '', result)
             
             # Verify all placeholders were restored
             missing_placeholders = []
@@ -121,16 +124,18 @@ class TranslationService:
 Return ONLY the translation."""
                 
                 response = self.openai_client.chat.completions.create(
-                    model="gpt-4",  # Changed to GPT-4
+                    model="gpt-4o",  # Changed to GPT-4
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": retry_prompt}
                     ],
-                    temperature=0.2  # Lower temperature for more consistent output
+                    temperature=0.1  # Lower temperature for more consistent output
                 )
                 
                 translated_text = response.choices[0].message.content.strip()
                 result = self._restore_placeholders(translated_text, placeholders)
+                # Clean up any remaining PHX markers again
+                result = re.sub(r'❮❮PHX❯❯', '', result)
             
             return result
         except Exception as e:
